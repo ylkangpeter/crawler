@@ -26,6 +26,10 @@ public class EtcConfig {
 
     public static final String key_checkPoint = "checkPoint";
 
+    public static final String gugu_ak = "gugu.ak";
+
+    public static final String gugu_memobirdId = "gugu.memobirdId";
+
 
     final public Properties checkpointProperties = new Properties();
     final public Properties properties = new Properties();
