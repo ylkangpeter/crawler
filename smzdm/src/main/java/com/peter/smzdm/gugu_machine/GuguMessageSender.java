@@ -1,9 +1,12 @@
 package com.peter.smzdm.gugu_machine;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.peter.smzdm.config.EtcConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.InputStream;
@@ -16,6 +19,7 @@ import java.util.Calendar;
 /**
  * Created by kangyongliang262 on 17/4/19.
  */
+@Service
 public class GuguMessageSender {
 
     private static final Logger logger =
@@ -28,6 +32,9 @@ public class GuguMessageSender {
     private static String outputFile = "../output/output.json";
     private static String md5File = "../output/output.md5";
 
+    @Resource
+    EtcConfig config;
+
     public static void main(String[] args) throws Exception {
         logger.info("=====================");
         logger.info("Start: " + Calendar.getInstance().getTime());
@@ -36,7 +43,7 @@ public class GuguMessageSender {
     }
 
     // HTTP GET request
-    private static int getUserId() throws Exception {
+    private int getUserId() throws Exception {
 
         String str = "http://open.memobird.cn/home/setuserbind?ak=8dfbabb2ec134aa8b5092237b7a616fa&" +
                 "timestamp=2014-11-14%2014:22:39&memobirdID=fba9fffb672c493b&useridentifying=12121233";
@@ -172,7 +179,7 @@ public class GuguMessageSender {
     }
 
     // HTTP POST request
-    public static void printMessage(String message, String type) throws Exception {
+    public void printMessage(String message, String type) throws Exception {
         int userId = getUserId();
         String url = "http://open.memobird.cn/home/printpaper";
         URL obj = new URL(url);
@@ -184,7 +191,8 @@ public class GuguMessageSender {
         con.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
 
         message = new String(Base64.getEncoder().encode(message.getBytes("GBK")));
-        String urlParameters = String.format("ak=8dfbabb2ec134aa8b5092237b7a616fa&printcontent=%s:%s&memobirdID=fba9fffb672c493b&userID=%d", type, message, userId);
+        String urlParameters = String.format("ak=%s&printcontent=%s:%s&memobirdID=%s&userID=%d",
+                config.properties.getProperty(EtcConfig.gugu_ak), config.properties.getProperty(EtcConfig.gugu_memobirdId), type, message, userId);
 
         // Send post request
         con.setDoOutput(true);
