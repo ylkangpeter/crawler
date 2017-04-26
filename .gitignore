@@ -16,3 +16,5 @@ hs_err_pid*
 .project/
 **/target/
 **/*.properties
+
+.DS_Store
