@@ -1,6 +1,7 @@
 package com.peter.smzdm.util;
 
 import com.peter.smzdm.config.EtcConfig;
+import com.peter.smzdm.gugu_machine.GuguMessageSender;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -20,6 +21,9 @@ public class MyUtil {
 
     @Resource
     private EtcConfig config;
+
+    @Resource
+    private GuguMessageSender guguService;
 
     private BufferedWriter fileWriter = null;
     private BufferedWriter md5Writer = null;
@@ -73,7 +77,11 @@ public class MyUtil {
     @PostConstruct
     private void init() throws IOException {
         lastTime = config.checkpointProperties.getProperty(EtcConfig.key_checkPoint);
-        fileWriter = new BufferedWriter(new FileWriter(new File(config.properties.getProperty(EtcConfig.outputFile))));
+        File outputFile = new File(config.properties.getProperty(EtcConfig.outputFile));
+        if (outputFile.exists()) {
+            outputFile.renameTo(new File(config.properties.getProperty(EtcConfig.outputFile) + "." + System.currentTimeMillis()));
+        }
+        fileWriter = new BufferedWriter(new FileWriter(outputFile));
         md5Writer = new BufferedWriter(new FileWriter(new File(config.properties.getProperty(EtcConfig.outputFileMd5))));
     }
 
@@ -98,12 +106,12 @@ public class MyUtil {
         String oldMd5 = br.readLine();
 
         if (message.length() > 0 && !md5.equals(oldMd5)) {
-            // send gugu message
-//            GuguMessageSender.printMessage(message.toString(), "T");
+//             send gugu message
+            guguService.printMessage(message.toString(), "T");
         }
         // write checkpoint
 
-        BufferedWriter bw = new BufferedWriter(new FileWriter(EtcConfig.class.getClassLoader().getResource(EtcConfig.checkpoint).getFile()));
+        BufferedWriter bw = new BufferedWriter(new FileWriter(new File(EtcConfig.checkpoint)));
         bw.write("checkpoint=" + latestTime);
         bw.close();
         // write md5
