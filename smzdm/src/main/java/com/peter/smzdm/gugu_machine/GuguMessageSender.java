@@ -38,7 +38,7 @@ public class GuguMessageSender {
     private int getUserId() throws Exception {
 
         String str = String.format("http://open.memobird.cn/home/setuserbind?ak=%s&" +
-                        "timestamp=2014-11-14%2014:22:39&memobirdID=%s&useridentifying=12121233",
+                        "timestamp=2014-11-14%%2014:22:39&memobirdID=%s&useridentifying=12121233",
                 config.properties.getProperty(EtcConfig.gugu_ak), config.properties.getProperty(EtcConfig.gugu_memobirdId));
 
         URL url = new URL(str);
