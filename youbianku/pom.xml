@@ -15,7 +15,7 @@
 
 
     <properties>
-        <start-class>com.peter.smzdm.AppMain</start-class>
+        <start-class>com.peter.pinganfang.AppMain</start-class>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
@@ -38,9 +38,13 @@
 
         <dependency>
             <groupId>edu.uci.ics</groupId>
-            <artifactId>crawler4j</artifactId>
-            <version>4.3</version>
+            <artifactId>crawer4j</artifactId>
+            <version>4.4-SNAPSHOT</version>
+            <!--<scope>system</scope>-->
+            <!--<systemPath>/Users/kangyongliang262/work_dir/code_base/3rd/crawler4j/crawler4j/target/crawler4j-4.4.0-SNAPSHOT.jar</systemPath>-->
         </dependency>
+
+
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
@@ -52,6 +56,12 @@
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
             <version>19.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <version>1.2.17</version>
         </dependency>
 
     </dependencies>
@@ -93,7 +103,7 @@
                   <archive>
                     <manifest>
                     <addClasspath>true</addClasspath>
-                    <mainClass>com.peter.smzdm.AppMain</mainClass>
+                    <mainClass>com.peter.pinganfang.AppMain</mainClass>
                     <classpathPrefix>dependency-jars/</classpathPrefix>
                     </manifest>
                   </archive>
@@ -123,4 +133,12 @@
 
         </plugins>
     </build>
+
+    <repositories>
+        <repository>
+            <id>onebeartoe</id>
+            <name>onebeartoe</name>
+            <url>https://repository-onebeartoe.forge.cloudbees.com/snapshot/</url>
+        </repository>
+    </repositories>
 </project>

@@ -24,10 +24,10 @@ import java.util.regex.Pattern;
  * Created by kangyongliang262 on 17/4/20.
  */
 @Component
-public class MyCrawler extends WebCrawler {
+public class MyCrawlerBak extends WebCrawler {
 
     private static final Logger logger =
-            LoggerFactory.getLogger(MyCrawler.class);
+            LoggerFactory.getLogger(MyCrawlerBak.class);
 
     private final static Pattern FILTERS = Pattern.compile(".*(\\.(css|js|gif|jpg"
             + "|png|mp3|mp3|zip|gz))$");

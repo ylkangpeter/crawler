@@ -185,7 +185,7 @@ public class GuguMessageSender {
 
         message = new String(Base64.getEncoder().encode(message.getBytes("GBK")));
         String urlParameters = String.format("ak=%s&printcontent=%s:%s&memobirdID=%s&userID=%d",
-                config.properties.getProperty(EtcConfig.gugu_ak), config.properties.getProperty(EtcConfig.gugu_memobirdId), type, message, userId);
+                config.properties.getProperty(EtcConfig.gugu_ak), type, message, config.properties.getProperty(EtcConfig.gugu_memobirdId), userId);
 
         // Send post request
         con.setDoOutput(true);

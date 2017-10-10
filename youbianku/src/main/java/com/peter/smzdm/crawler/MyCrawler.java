@@ -1,22 +1,18 @@
 package com.peter.smzdm.crawler;
 
-import com.peter.smzdm.util.MyUtil;
 import edu.uci.ics.crawler4j.crawler.Page;
 import edu.uci.ics.crawler4j.crawler.WebCrawler;
 import edu.uci.ics.crawler4j.parser.HtmlParseData;
 import edu.uci.ics.crawler4j.url.WebURL;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Resource;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.util.Iterator;
+import java.io.*;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.regex.Pattern;
 
@@ -34,10 +30,24 @@ public class MyCrawler extends WebCrawler {
 
     private CrawlStat myCrawlStat = new CrawlStat();
 
-    @Resource
-    private MyUtil util;
-
     private boolean shouldStop = false;
+
+    private static BufferedWriter bw = null;
+
+    private static int inx_start = "https://www.youbianku.cn/node/".length();
+
+    private static Set<Integer> set = new HashSet<>();
+
+//    private static Set<String>
+
+
+    static {
+        try {
+            bw = new BufferedWriter(new FileWriter(new File(MyController.PATH + "/out.txt"), true));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     /**
      * This method receives two parameters. The first parameter is the page
@@ -51,9 +61,25 @@ public class MyCrawler extends WebCrawler {
      */
     @Override
     public boolean shouldVisit(Page referringPage, WebURL url) {
-        String href = url.getURL().toLowerCase();
-        return !FILTERS.matcher(href).matches()
-                && href.startsWith("http://www.smzdm.com/youhui/p") && !shouldStop;
+//        String href = url.getURL().toLowerCase();
+//        return !FILTERS.matcher(href).matches()
+//                && ((href.startsWith("https://www.youbianku.cn/node/") && isContinue(href))) && !shouldStop;
+        return false;
+    }
+
+    private boolean isContinue(String href) {
+        int number = 0;
+        if (href.endsWith("p")) {
+            number = Integer.parseInt(href.substring(inx_start, href.length() - 4));
+        } else {
+            number = Integer.parseInt(href.substring(inx_start, href.length()));
+        }
+        if (set.contains(number)) {
+            return false;
+        } else {
+            set.add(number);
+        }
+        return true;
     }
 
     /**
@@ -70,34 +96,33 @@ public class MyCrawler extends WebCrawler {
             HtmlParseData htmlParseData = (HtmlParseData) page.getParseData();
             String text = htmlParseData.getText();
             String html = htmlParseData.getHtml();
-            String time = "";
 
             Document doc = Jsoup.parse(html);
-            Elements items = doc.select("div.list.list_preferential");
-            for (Iterator<Element> iter = items.iterator(); iter.hasNext(); ) {
-                Element e = iter.next();
-                time = util.normalizeTime(e.select("span.lrTime").text());
-                util.updateTime(time);
-                if (!util.shouldStop(time)) {
-                    String title = e.select("div h2 a").text();
-                    if (util.isMatch(title)) {
-                        String itemUrl = e.select("div h2 a").attr("href");
-//                        String desc = e.select("div div.lrInfo p").text();
-                        String desc = "";
-                        try {
-                            String msg = String.format("%s\r\n%s\r\n%s\r\n%s\r\n", time, title, itemUrl, desc);
-                            logger.info("found match: \n" + msg);
-                            util.writeOutputFile(msg);
-                        } catch (IOException e1) {
-                            logger.error(e1.getMessage(), e1);
-                        }
-                    }
-                } else {
-                    logger.info(String.format("reach last crawler point %s stooooop!", time));
-                    shouldStop = true;
-                    return;
-                }
+            Elements items = doc.select("ul .field-item");
 
+            String address = items.get(2).select("[itemprop]").text();
+            String district = items.get(5).select("[itemprop]").text();
+            String city = items.get(4).select("[itemprop]").text();
+            String province = items.get(3).select("[itemprop]").text();
+            String postcode = items.get(6).select("[itemprop]").text();
+
+//            String nextUrl = items.get(items.size() - 1).select("a").text();
+
+            try {
+                bw.write(province);
+                bw.write("\t");
+                bw.write(city);
+                bw.write("\t");
+                bw.write(district);
+                bw.write("\t");
+                bw.write(postcode);
+                bw.write("\t");
+                bw.write(address);
+                bw.write("\t");
+                bw.write(url);
+                bw.write("\n");
+            } catch (Exception e) {
+                e.printStackTrace();
             }
 
             Set<WebURL> links = htmlParseData.getOutgoingUrls();
@@ -121,7 +146,7 @@ public class MyCrawler extends WebCrawler {
     @Override
     public void onBeforeExit() {
         try {
-            util.finish();
+            bw.close();
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
         }

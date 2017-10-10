@@ -97,7 +97,8 @@ public class MyUtil {
         String line = "";
         StringBuilder message = new StringBuilder();
         while ((line = br.readLine()) != null) {
-            message.append(line);
+            message.append(line).append("\r\n");
+            message.append("----------------------\r\n");
         }
         br.close();
         String md5 = new HexBinaryAdapter().marshal(digest.digest(message.toString().getBytes("utf-8")));
